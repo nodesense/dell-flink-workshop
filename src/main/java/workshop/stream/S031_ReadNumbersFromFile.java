@@ -9,6 +9,10 @@ public class S031_ReadNumbersFromFile {
     //
     public static void main(String[] args) throws  Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        // parallelism
+        System.out.println("Parallelism default " + env.getParallelism());
+        env.setParallelism(6);
+        System.out.println("Parallelism set " + env.getParallelism());
         DataStream<String> texts = env.readTextFile("/home/rps/flink-workshop/data/mynumbers.txt");
 
         // action
@@ -25,6 +29,8 @@ public class S031_ReadNumbersFromFile {
                 return true; // string shall be passed to map function below
             }
         });
+
+        DataStream<String> filtered2 = texts.filter(s -> !s.trim().isEmpty());
 
         DataStream<Integer> parsed = filtered.map(new MapFunction<String, Integer>() {
             @Override
@@ -46,6 +52,9 @@ public class S031_ReadNumbersFromFile {
         });
 
         multiplyBy10.print();
+        // using relative path, not a good pratice
+        // use Sink instead of writeAsText in projects
+        multiplyBy10.writeAsText("/home/rps/flink-workshop/output/results");
         // client program exited faster than data flow execution
         env.execute(); // run the data flow graph at job manager etc..
     }

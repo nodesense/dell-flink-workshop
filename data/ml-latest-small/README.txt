@@ -1,3 +1,17 @@
+links.csv
+movieId,imdbId,tmdbId
+--
+movies.csv
+movieId,title,genres
+--
+ratings.csv
+userId,movieId,rating,timestamp
+---
+tags.csv
+userId,movieId,tag,timestamp
+
+
+
 Summary
 =======
 

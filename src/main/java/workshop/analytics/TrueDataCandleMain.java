@@ -88,6 +88,27 @@ public class TrueDataCandleMain {
 
 
         candleStream.print(); // no collect is used, won't print anything
+
+        // finally publish candles to kafka
+
+        Table candleTempTable = tableEnv.fromDataStream(candleStream);
+
+        // register the Table object as a view and query it
+        tableEnv.createTemporaryView("TempCandles", candleTempTable);
+
+        String CandleKafka = SqlText.getSQL("sql/CandleKafka.sql");
+        System.out.println(CandleKafka);
+
+        tableEnv.executeSql(CandleKafka);
+
+        // INSERT INTO CandleKafka is a data flow graph
+        //  FROM is source table TempCandles
+        // SELECT..complex queries are transformation, aggregation etc...
+        //   INTO table CandleKafka is sink table
+
+        tableEnv.executeSql("INSERT INTO CandleKafka SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT FROM TempCandles");
+//
+
         // get the graph and submit to job manager
         env.execute();
 

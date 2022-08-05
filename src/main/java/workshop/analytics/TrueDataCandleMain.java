@@ -1,6 +1,7 @@
 package workshop.analytics;
 
 
+import org.apache.flink.core.execution.JobClient;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -18,6 +19,9 @@ import workshop.models.TrueDataTick;
 import workshop.util.SqlText;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+
 // FQN - Fully Quafied name to be given while subbmit flink job
 // workshop.analytics.TrueDataCandleMain
 public class TrueDataCandleMain {
@@ -109,15 +113,41 @@ public class TrueDataCandleMain {
         //   INTO table CandleKafka is sink table
 
         TableResult result2 = tableEnv.executeSql("INSERT INTO CandleKafka SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT FROM TempCandles");
-//
+        // get the graph and submit to job manager
+        env.execute();
+
+        //
         try {
+            JobClient jobClient = result2.getJobClient().get();
             System.out.println(" JOB ID " + result2.getJobClient().get().getJobID());
+
+            Thread.sleep(30 * 1000);
+            System.out.println("Now cancelling job " + System.currentTimeMillis());
+
+            // will not wait for result or cancellation
+            //  jobClient.cancel();
+
+            // Sync wait for cancel to happen, blocking call
+          jobClient.cancel().get(); // blocking call, wait until job cancelled
+           System.out.println("Job cancelled successfully " + System.currentTimeMillis());
+
+            // async, not blocking confirmation using java future
+           //  CompletableFuture<Void> cancelFuture = jobClient.cancel();
+//             cancelFuture.completeAsync(new Supplier<Void>() {
+//                 @Override
+//                 public Void get() {
+//                     System.out.println("Job cancelled successfully");
+//                     return null;
+//                 }
+//             });
+
+
+            //  System.out.println("Job cancelled successfully " + System.currentTimeMillis());
+
         }catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();
         }
-        // get the graph and submit to job manager
-        env.execute();
 
 
     }

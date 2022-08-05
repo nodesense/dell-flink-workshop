@@ -10,6 +10,7 @@ import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import workshop.functions.TickWindowDemo;
 import workshop.models.Candle;
@@ -17,7 +18,8 @@ import workshop.models.TrueDataTick;
 import workshop.util.SqlText;
 
 import java.time.Duration;
-
+// FQN - Fully Quafied name to be given while subbmit flink job
+// workshop.analytics.TrueDataCandleMain
 public class TrueDataCandleMain {
     public static void main(String[] args) throws  Exception {
         // set up the Java DataStream API
@@ -26,7 +28,7 @@ public class TrueDataCandleMain {
         // set up the Java Table API
         final StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
-        String TrueDataTickKafkaSourceJson = SqlText.getSQL("sql/TrueDataTickKafkaSourceJson.sql");
+        String TrueDataTickKafkaSourceJson = SqlText.getSQL("/sql/TrueDataTickKafkaSourceJson.sql");
         System.out.println(TrueDataTickKafkaSourceJson);
         tableEnv.executeSql(TrueDataTickKafkaSourceJson);
         // Stream tables are called dynamic tables
@@ -96,7 +98,7 @@ public class TrueDataCandleMain {
         // register the Table object as a view and query it
         tableEnv.createTemporaryView("TempCandles", candleTempTable);
 
-        String CandleKafka = SqlText.getSQL("sql/CandleKafka.sql");
+        String CandleKafka = SqlText.getSQL("/sql/CandleKafka.sql");
         System.out.println(CandleKafka);
 
         tableEnv.executeSql(CandleKafka);
@@ -106,9 +108,14 @@ public class TrueDataCandleMain {
         // SELECT..complex queries are transformation, aggregation etc...
         //   INTO table CandleKafka is sink table
 
-        tableEnv.executeSql("INSERT INTO CandleKafka SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT FROM TempCandles");
+        TableResult result2 = tableEnv.executeSql("INSERT INTO CandleKafka SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT FROM TempCandles");
 //
-
+        try {
+            System.out.println(" JOB ID " + result2.getJobClient().get().getJobID());
+        }catch (Exception ex) {
+            System.out.println(ex);
+            ex.printStackTrace();
+        }
         // get the graph and submit to job manager
         env.execute();
 

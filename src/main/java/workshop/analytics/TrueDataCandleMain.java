@@ -113,6 +113,26 @@ public class TrueDataCandleMain {
         //   INTO table CandleKafka is sink table
 
         TableResult result2 = tableEnv.executeSql("INSERT INTO CandleKafka SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT FROM TempCandles");
+
+
+
+        String CandleParquet = SqlText.getSQL("/sql/CandleParquet.sql");
+        System.out.println(CandleParquet);
+
+        tableEnv.executeSql(CandleParquet);
+
+        TableResult result3 = tableEnv.executeSql("INSERT INTO CandleParquet SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT FROM TempCandles");
+
+
+        String CandleParquetPartition = SqlText.getSQL("/sql/CandleParquetPartitions.sql");
+        System.out.println(CandleParquetPartition);
+
+        tableEnv.executeSql(CandleParquetPartition);
+
+        TableResult result4 = tableEnv.executeSql("INSERT INTO CandleParquetPartition SELECT `asset`, st, et, O, C, H, L, A ,DT, V, TA,  GapC, Gap , GapL , GapH, OI, OIDiff, OIGap, UN, N50, N50T, BNF, BNFT, DATE_FORMAT(et, 'yyyy-MM-dd') as dt  FROM TempCandles");
+
+
+
         // get the graph and submit to job manager
         env.execute();
 

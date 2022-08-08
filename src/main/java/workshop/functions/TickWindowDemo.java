@@ -73,6 +73,7 @@ public class TickWindowDemo extends  ProcessWindowFunction<TrueDataTick, Candle,
             if (candle == null) {
 
                 candle = new Candle();
+                candle.asset = tick.Symbol;
                 candle.st = tick.Timestamp;
                 candle.O = tick.LTP; // last traded stock price
                 candle.L = tick.LTP;

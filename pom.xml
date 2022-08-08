@@ -176,6 +176,20 @@
                 <!--            <scope>test</scope>-->
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-avro-confluent-registry</artifactId>
+                <version>1.15.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-avro</artifactId>
+                <version>1.15.1</version>
+                <!-- todo: provided -->
+            </dependency>
+
+
             <!--        <dependency>-->
             <!--            <groupId>org.projectlombok</groupId>-->
             <!--            <artifactId>lombok</artifactId>-->

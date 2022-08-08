@@ -60,6 +60,8 @@ public class TrueDataTick {
                 ", partition=" + partition +
                 ", offset=" + offset +
                 ", event time=" + event_time +
+
+
                 '}';
     }
 

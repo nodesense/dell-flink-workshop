@@ -37,7 +37,7 @@ public class TrueDataCandleMain {
         tableEnv.executeSql(TrueDataTickKafkaSourceJson);
         // Stream tables are called dynamic tables
         //stream tables shall have change log, newly added reocrd/modified records are published
-        final Table result =  tableEnv.sqlQuery("SELECT * FROM TrueDataTicks WHERE Volume > 30000");
+        final Table result =  tableEnv.sqlQuery("SELECT * FROM TrueDataTicks");
        // result.execute().print();
         // type cast Table Row into Java POJO
 
